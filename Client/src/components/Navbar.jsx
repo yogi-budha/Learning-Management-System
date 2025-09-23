@@ -12,6 +12,7 @@ import {
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu"
 import { DarkMode } from './DarkMode'
+import { Link } from 'react-router-dom'
 
 function Navbar() {
     const user = true
@@ -36,10 +37,10 @@ function Navbar() {
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            My learning
+            <Link to="/mylearning">My learning</Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            Edit Profile
+          <Link to="/profile">Profile</Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
             Log out

@@ -38,8 +38,14 @@ export const authApi = createApi({
                     
                 }
             }
+        }),
+        getUser:builder.query({
+            query:()=>({
+                url:"getUser",
+                method:"GET"
+            })
         })
     })
 })
 
-export const {useUserLoginMutation,useUserSignupMutation} = authApi
+export const {useUserLoginMutation,useUserSignupMutation,useGetUserQuery} = authApi

@@ -45,8 +45,6 @@ export const login = async (req, res) => {
   
     const user = await User.findOne({ email });
 
-
-  
     if(!user){
       res.status(400).json({
           success: false,
@@ -75,3 +73,42 @@ export const login = async (req, res) => {
     });
  }
 };
+
+export const logout = async (req,res)=>{
+  try {
+    return res.status(200).cookie("token","",{maxAge:0}).json({
+      success:true,
+      message:"logout successfully"
+    })
+    
+  } catch (error) {
+    return  res.status(400).json({
+      success: false,
+      message: "Server failed",
+    });
+  }
+}
+
+export const getUserDetails = async (req,res)=>{
+  try {
+    const id = req.id
+    const user = await User.findById(id)
+    console.log(user)
+    if(!user){
+      return res.status(400).json({
+        success:false,
+        message:"User not found"
+      })
+    }
+    return res.status(200).json({
+      success:true,
+      user
+    })
+  } catch (error) {
+    return  res.status(400).json({
+      success: false,
+      message: "Server failed",
+    });
+    
+  }
+}
