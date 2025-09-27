@@ -15,7 +15,7 @@ function Courses() {
             isLoading ? <div className='grid grid-cols-3 gap-5 w-full'>
            {Array.from({ length: 5 }).map((_, i) => (
             
-            <CardSkeleton/>
+            <CardSkeleton key={i}/>
           ))}
             </div>:list.map((_,i)=><CourseCard key={i}/>)
         

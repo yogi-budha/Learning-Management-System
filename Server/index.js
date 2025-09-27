@@ -5,6 +5,7 @@ import cors from "cors"
 import connectDB from "./config/dbConnect.js"
 import userRouter from './router/user.routes.js'
 import cookieParser from "cookie-parser"
+import { cloudnaryConfig } from "./config/cloudinaryConfig.js"
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -31,5 +32,6 @@ app.use("/api/user",userRouter)
 
 app.listen(PORT,()=>{
     connectDB()
+    cloudnaryConfig()
     console.log("Server started successfully")
 })

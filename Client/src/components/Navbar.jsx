@@ -12,10 +12,28 @@ import {
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu"
 import { DarkMode } from './DarkMode'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+
+import profilePic from "@/assets/profilePic.webp";
 
 function Navbar() {
-    const user = true
+    const  navigate = useNavigate();
+    const [logoutData,isSuccess,isError] = useLogoutUserMutation()
+    
+  const {data} = useGetUserQuery()
+    const logoutHandler = async()=>{
+      await logoutData()
+      navigate("/login")
+      
+      toast.success("logout Successfully")
+    }
+
+    useEffect(()=>{
+
+      if(isError){
+        toast.error("error while logout")
+      }
+    },[isSuccess,isError,navigate])
   return (
     <div className='flex items-center justify-center  w-full h-16 fixed right-0 top-0 left-0 z-10 p-4 shadow-lg'>
         <div className='flex items-center gap-3  w-[70%] '>
@@ -23,13 +41,14 @@ function Navbar() {
         <h2 className='font-bold text-2xl'>E-Learning</h2>
         </div>
 
-        {user ? 
+        {data ? 
         
          <div className='flex items-center gap-10'>
         <DropdownMenu>
       <DropdownMenuTrigger asChild>
       <Avatar>
-  <AvatarImage src="https://github.com/shadcn.png" />
+     
+  <AvatarImage className='' src={`${data?.user?.photoUrl || profilePic }`} />
   <AvatarFallback>CN</AvatarFallback>
 </Avatar>
       </DropdownMenuTrigger>
@@ -42,7 +61,7 @@ function Navbar() {
           <DropdownMenuItem>
           <Link to="/profile">Profile</Link>
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={logoutHandler}>
             Log out
           </DropdownMenuItem>
         </DropdownMenuGroup>
@@ -61,8 +80,8 @@ function Navbar() {
         </div>  :
         <div className="gap-4 flex items-center justify-between">
  
-  <Button className='bg-slate-700'>Sign up</Button>
-  <Button className={'bg-slate-500'}>Login</Button>
+  <Button className='bg-slate-700' onClick={()=> navigate("/login")} >Sign up</Button>
+  <Button className={'bg-slate-500'} onClick={()=> navigate("/login") }>Login</Button>
 </div>
 
 
@@ -83,6 +102,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { useGetUserQuery, useLogoutUserMutation } from '@/features/api/authApi'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 
 export function MobileNavbar() {
     const role = 'instructor'

@@ -14,13 +14,17 @@ import {
   useUserLoginMutation,
   useUserSignupMutation,
 } from "@/features/api/authApi";
+import { userLoggedIn } from "@/features/authSlice";
 import { Loader } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 export function Login() {
   const [signup, setSignup] = useState({ name: "", email: "", password: "" });
   const [login, setLogin] = useState({ email: "", password: "" });
+  const dispatch = useDispatch()
   const [
     loginUser,
     {
@@ -42,6 +46,8 @@ export function Login() {
     },
   ] = useUserSignupMutation();
 
+  const navigate = useNavigate()
+
   const onChangeHandler = (e, type) => {
     const { name, value } = e.target;
     if (type == "signup") {
@@ -51,21 +57,24 @@ export function Login() {
     }
   };
    useEffect(()=>{
-    console.log(signupUserData,loginUserData)
     if(isSuccessLoginUser && loginUserData) {
       toast.success(loginUserData.message || "Login Successful")
+      dispatch(userLoggedIn({ user:loginUserData.user }))
+      navigate("/")
     }
     if(isErrorLoginUser && !loginUserData) {
       toast.error(errorLogin.data.message)
     }
     if(isSuccessSignupUser && signupUserData) {
       toast.success(signupUserData.message || "Signup Successful")
+      navigate("/")
+      dispatch(userLoggedIn({ user:signupUserData.user }))
     }
     if(isErrorSignupUser && !signupUserData) {
       toast.error(errorSignup.data.message)
     }
 
-   },[isSuccessLoginUser,isSuccessSignupUser,isErrorLoginUser,isErrorSignupUser,signupUserData,loginUserData,errorLogin,errorSignup])
+   },[isSuccessLoginUser,isSuccessSignupUser,isErrorLoginUser,isErrorSignupUser,signupUserData,loginUserData,errorLogin,errorSignup,navigate,dispatch])
 
   const onSubmitHandler =async (type) => {
     
@@ -73,6 +82,7 @@ export function Login() {
     const action = type == "signup" ? signupUser : loginUser
     
   await action(inputData)
+
   
   };
 
@@ -81,7 +91,7 @@ export function Login() {
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="flex  justify-center w-full max-w-sm flex-col gap-6">
-        <Tabs defaultValue="account">
+        <Tabs defaultValue="login">
           <TabsList className="w-full">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="signup">Signup</TabsTrigger>

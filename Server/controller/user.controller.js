@@ -1,6 +1,7 @@
 import { User } from "../models/user.model.js";
 import bcrypt from 'bcryptjs'
 import { generateToken } from "../utils/generateToken.js";
+import { deleteMediaFromCloudnary, uploadMediaToCloudnary } from "../utils/cloudnary.js";
 
 export const register = async (req, res) => {
   try {
@@ -109,6 +110,49 @@ export const getUserDetails = async (req,res)=>{
       success: false,
       message: "Server failed",
     });
+    
+  }
+}
+
+
+export const updateUser = async(req,res)=>{
+  try {
+    const id = req.id
+    const {name} = req.body
+    const profilePhoto= req.file
+    const user = await User.findById(id)
+    console.log(user)
+    if(!user){
+      return res.status(400).json({
+        success:false,
+        message:"user not found"
+      })
+
+    }
+    if(user.photoUrl){
+      const publicId = await user.photoUrl.split("/").pop().split(".")[0]
+      await deleteMediaFromCloudnary(publicId)
+    }
+
+    const cloudnary_Response = await uploadMediaToCloudnary(profilePhoto.path)
+    const photoUrl = cloudnary_Response.secure_url
+
+
+
+
+    const updatedUser = await User.findByIdAndUpdate(id,{name,photoUrl},{new:true})
+
+    return res.status(200).json({
+      updatedUser,
+      success:true,
+      message:"user updated successfully"
+    })
+  } catch (error) {
+    console.log(error)
+    return res.status(400).json({
+      success:false,
+      message:"server failed"
+    })
     
   }
 }
