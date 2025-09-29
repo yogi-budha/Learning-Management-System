@@ -6,7 +6,7 @@ import connectDB from "./config/dbConnect.js"
 import userRouter from './router/user.routes.js'
 import cookieParser from "cookie-parser"
 import { cloudnaryConfig } from "./config/cloudinaryConfig.js"
-
+import courseRouter from './router/course.routes.js'
 const app = express()
 const PORT = process.env.PORT || 5000
 
@@ -29,6 +29,7 @@ app.get("/",(req,res)=>{
 // user api
 
 app.use("/api/user",userRouter)
+app.use("/api/course",courseRouter)
 
 app.listen(PORT,()=>{
     connectDB()

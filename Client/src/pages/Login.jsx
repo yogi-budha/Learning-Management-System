@@ -24,7 +24,7 @@ import { toast } from "sonner";
 export function Login() {
   const [signup, setSignup] = useState({ name: "", email: "", password: "" });
   const [login, setLogin] = useState({ email: "", password: "" });
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const [
     loginUser,
     {
@@ -32,7 +32,7 @@ export function Login() {
       isLoading: isLoadingLoginUser,
       isSuccess: isSuccessLoginUser,
       isError: isErrorLoginUser,
-      error:errorLogin
+      error: errorLogin,
     },
   ] = useUserLoginMutation();
   const [
@@ -41,12 +41,12 @@ export function Login() {
       data: signupUserData,
       isLoading: isLoadingSignupUser,
       isError: isErrorSignupUser,
-     isSuccess:isSuccessSignupUser,
-     error:errorSignup
+      isSuccess: isSuccessSignupUser,
+      error: errorSignup,
     },
   ] = useUserSignupMutation();
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const onChangeHandler = (e, type) => {
     const { name, value } = e.target;
@@ -56,37 +56,48 @@ export function Login() {
       setLogin({ ...login, [name]: value });
     }
   };
-   useEffect(()=>{
-    if(isSuccessLoginUser && loginUserData) {
-      toast.success(loginUserData.message || "Login Successful")
-      dispatch(userLoggedIn({ user:loginUserData.user }))
-      navigate("/")
+  useEffect(() => {
+    if (isSuccessLoginUser && loginUserData) {
+      toast.success(loginUserData.message || "Login Successful");
+      navigate("/");
     }
-    if(isErrorLoginUser && !loginUserData) {
-      toast.error(errorLogin.data.message)
+    if (isErrorLoginUser && !loginUserData) {
+      toast.error(errorLogin.data.message);
     }
-    if(isSuccessSignupUser && signupUserData) {
-      toast.success(signupUserData.message || "Signup Successful")
-      navigate("/")
-      dispatch(userLoggedIn({ user:signupUserData.user }))
+    if (isSuccessSignupUser && signupUserData) {
+      toast.success(signupUserData.message || "Signup Successful");
+      navigate("/");
     }
-    if(isErrorSignupUser && !signupUserData) {
-      toast.error(errorSignup.data.message)
+    if (isErrorSignupUser && !signupUserData) {
+      toast.error(errorSignup.data.message);
     }
+  }, [
+    isSuccessLoginUser,
+    isSuccessSignupUser,
+    isErrorLoginUser,
+    isErrorSignupUser,
+    signupUserData,
+    loginUserData,
+    errorLogin,
+    errorSignup,
+    navigate,
+    dispatch,
+  ]);
 
-   },[isSuccessLoginUser,isSuccessSignupUser,isErrorLoginUser,isErrorSignupUser,signupUserData,loginUserData,errorLogin,errorSignup,navigate,dispatch])
-
-  const onSubmitHandler =async (type) => {
-    
+  const onSubmitHandler = async (type) => {
+    try{
     const inputData = type === "signup" ? signup : login;
-    const action = type == "signup" ? signupUser : loginUser
-    
-  await action(inputData)
+    const action = type == "signup" ? signupUser : loginUser;
 
-  
+   const result =  await action(inputData).unwrap()
+
+    dispatch(userLoggedIn({ user: result.user }));
+    toast.success(result.message || `${type} successful`);
+    navigate("/");
+  } catch (err) {
+    toast.error(err.data?.message || "Something went wrong");
+  }
   };
-
-  
 
   return (
     <div className="flex items-center justify-center h-screen">
@@ -126,10 +137,17 @@ export function Login() {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button disable={isLoadingLoginUser} onClick={() => onSubmitHandler("login")}>
-                  {
-                    isLoadingLoginUser ? <><Loader className="px-4 w-4 h-4 animate-spin"/></> : "Login"
-                  }
+                <Button
+                  disable={isLoadingLoginUser}
+                  onClick={() => onSubmitHandler("login")}
+                >
+                  {isLoadingLoginUser ? (
+                    <>
+                      <Loader className="px-4 w-4 h-4 animate-spin" />
+                    </>
+                  ) : (
+                    "Login"
+                  )}
                 </Button>
               </CardFooter>
             </Card>
@@ -172,10 +190,17 @@ export function Login() {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button disable= {isLoadingSignupUser} onClick={() => onSubmitHandler("signup")}>
-                {
-                    isLoadingSignupUser ? <>< Loader className="px-4 w-4 h-4 animate-spin"/></> : "Signup"
-                  }  
+                <Button
+                  disable={isLoadingSignupUser}
+                  onClick={() => onSubmitHandler("signup")}
+                >
+                  {isLoadingSignupUser ? (
+                    <>
+                      <Loader className="px-4 w-4 h-4 animate-spin" />
+                    </>
+                  ) : (
+                    "Signup"
+                  )}
                 </Button>
               </CardFooter>
             </Card>

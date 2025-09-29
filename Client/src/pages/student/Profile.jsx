@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import { Loader } from 'lucide-react'
 import profilePic from "@/assets/profilePic.webp";
 import { useSelector } from 'react-redux'
+import { TestAuth } from '@/components/TestAuth'
 
 
 function Profile() {

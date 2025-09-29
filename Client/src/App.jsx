@@ -7,6 +7,10 @@ import HeroSection from './pages/student/HeroSection'
 import MainLayout from './components/MainLayout'
 import MyLearning from './pages/student/MyLearning'
 import Profile from './pages/student/Profile'
+import Dashboard from './pages/admin/Dashboard'
+import AdminSideBar from './pages/admin/Sidebar'
+import CoursesTable from './pages/admin/CoursesTable'
+import CreateCourses from './pages/admin/CreateCourses'
 
 
 
@@ -42,6 +46,24 @@ function App() {
     {
       path:"/login",
       element:<Login/>
+    },
+    {
+      path:"/admin",
+      element:<AdminSideBar/>,
+      children:[
+        {
+          path:"dashboard",
+          element:<Dashboard/>
+        },
+        {
+          path:"dashboard/courses",
+          element:<CoursesTable/>
+        },
+        {
+          path:"dashboard/createCourse",
+          element:<CreateCourses/>
+        },
+      ]
     }
   ])
 

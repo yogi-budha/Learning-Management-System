@@ -13,17 +13,21 @@ import {
   } from "@/components/ui/dropdown-menu"
 import { DarkMode } from './DarkMode'
 import { Link, useNavigate } from 'react-router-dom'
-
+import { useDispatch } from "react-redux";
 import profilePic from "@/assets/profilePic.webp";
+import logo from "@/assets/logo.png";
 
 function Navbar() {
-    const  navigate = useNavigate();
-    const [logoutData,isSuccess,isError] = useLogoutUserMutation()
-    
-  const {data} = useGetUserQuery()
+  const  navigate = useNavigate();
+  const [logoutData,isSuccess,isError] = useLogoutUserMutation()
+  
+  const dispatch = useDispatch()
+    const {user} = useSelector((state)=>state.auth)
+    console.log(user)
     const logoutHandler = async()=>{
       await logoutData()
       navigate("/login")
+      dispatch(userLoggedOut())
       
       toast.success("logout Successfully")
     }
@@ -35,20 +39,21 @@ function Navbar() {
       }
     },[isSuccess,isError,navigate])
   return (
-    <div className='flex items-center justify-center  w-full h-16 fixed right-0 top-0 left-0 z-10 p-4 shadow-lg'>
+    <div className='flex items-center justify-center  w-full h-20 fixed right-0 top-0 left-0 z-10 p-4 shadow-lg bg-white'>
         <div className='flex items-center gap-3  w-[70%] '>
-             <School2 className='w-8 h-8'/>
-        <h2 className='font-bold text-2xl'>E-Learning</h2>
+            <Link to={"/"} className='flex gap-3'> 
+            <img className='w-15' src={logo} alt="" />
+            <h2 className='font-bold text-2xl'>E-Learning</h2></Link>
         </div>
 
-        {data ? 
+        {user ? 
         
          <div className='flex items-center gap-10'>
         <DropdownMenu>
       <DropdownMenuTrigger asChild>
-      <Avatar>
+      <Avatar className={'w-12 h-12'}>
      
-  <AvatarImage className='' src={`${data?.user?.photoUrl || profilePic }`} />
+  <AvatarImage  src={`${user?.photoUrl || profilePic }`} />
   <AvatarFallback>CN</AvatarFallback>
 </Avatar>
       </DropdownMenuTrigger>
@@ -65,10 +70,15 @@ function Navbar() {
             Log out
           </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
+    {
+      user.role == "instructor" && <>
+          <DropdownMenuSeparator />
         <DropdownMenuItem>
           Dashboard
+          
         </DropdownMenuItem>
+      </>
+    }
       </DropdownMenuContent>
     </DropdownMenu>
     <div className="hidden md:block">
@@ -102,9 +112,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { useGetUserQuery, useLogoutUserMutation } from '@/features/api/authApi'
+import {  useLogoutUserMutation } from '@/features/api/authApi'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
+import {  useSelector } from 'react-redux'
+import { userLoggedOut } from '@/features/authSlice'
 
 export function MobileNavbar() {
     const role = 'instructor'
