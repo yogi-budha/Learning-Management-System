@@ -11,6 +11,8 @@ import Dashboard from './pages/admin/Dashboard'
 import AdminSideBar from './pages/admin/Sidebar'
 import CoursesTable from './pages/admin/CoursesTable'
 import CreateCourses from './pages/admin/CreateCourses'
+import CourseForm from './pages/admin/CourseForm'
+import CreateLecture from './pages/lecture/CreateLecture'
 
 
 
@@ -63,6 +65,14 @@ function App() {
           path:"dashboard/createCourse",
           element:<CreateCourses/>
         },
+        {
+          path:"dashboard/courses/createCourseForm/:id",
+          element:<CourseForm/>
+        },
+        {
+          path:"dashboard/courses/createCourseForm/:id/lecture",
+          element:<CreateLecture/>
+        }
       ]
     }
   ])

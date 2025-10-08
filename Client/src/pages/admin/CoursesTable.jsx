@@ -13,6 +13,7 @@ import {
 import { useGetCoursesQuery } from '@/features/api/courseApi'
 import { Button } from '@/components/ui/button'
 import { Edit } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 
 
@@ -38,10 +39,10 @@ function CoursesTable() {
       <TableBody>
         {data?.createrCourses?.map((course) => (
           <TableRow key={course._id}>
-            <TableCell className="font-medium">{course?.price ?? "NA" }</TableCell>
+            <TableCell className="font-medium">{course?.coursePrice ?? "NA" }</TableCell>
             <TableCell><Button className={"p-2 py-0 cursor-pointer"}>{course?.pending ? "Publish":"Draft"}</Button ></TableCell>
             <TableCell>{course?.courseTitle}</TableCell>
-            <TableCell className="text-right"><Button className={"cursor-pointer"}><Edit/></Button></TableCell>
+            <TableCell className="text-right"><Link to={`createCourseForm/${course._id}`}><Button  className={"cursor-pointer"}><Edit/></Button></Link></TableCell>
           </TableRow>
         ))}
       </TableBody>
