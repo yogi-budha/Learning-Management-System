@@ -1,24 +1,42 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Edit } from "lucide-react";
+import { Edit, Loader2 } from "lucide-react";
 import NavbarAd from "../admin/NavbarAd";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import {  useCreateLectureMutation, useGetCourseLectureQuery } from "@/features/api/courseApi";
+import { toast } from "sonner";
 
-const lecturesData = [
-  "Introduction to Docker and Containerization",
-  "Setting Up Your Docker Environment",
-  "Understanding Docker Images and Containers",
-  "Building Custom Docker Images with Dockerfile",
-  "Managing Multi-Container Applications with Docker Compose",
-];
+
 
 export default function CreateLecture() {
+  const  navigate = useNavigate();
+  const [lectureTitle,setLectureTitle] = useState("")
     const  { id } = useParams()
-    console.log(id)
+    const [createUser,{isLoading,isError,isSuccess}] = useCreateLectureMutation()
+   const {data}= useGetCourseLectureQuery(id)
+
+    const onSubmitHandler = async()=>{
+      console.log(lectureTitle)
+    await createUser({inputData:{lectureTitle},courseId:id})
+    }
+
+    console.log(data)
+    
+
+    useEffect(()=>{
+      if(isSuccess){
+        toast.success("Lecture Created Successfully")
+      }
+      if(isError){
+        toast.error("Failed to created lecture")
+      }
+    },[isSuccess,isError])
+
+    
   return (
 
     <div className="flex flex-col w-[80%] h-full p-4 ml-[18rem]">
@@ -46,6 +64,9 @@ export default function CreateLecture() {
             id="lecture-title"
             placeholder="Your Lecture Title Name"
             className="mt-1"
+            name="lectureTitle"
+            value={lectureTitle}
+            onChange={(e)=>setLectureTitle(e.target.value)}
           />
         </div>
         <div className="flex gap-2 mt-6">
@@ -53,26 +74,29 @@ export default function CreateLecture() {
             
           <Button variant="outline">Back to course</Button>
             </Link>
-          <Button>Create Lecture</Button>
+            {
+              isLoading ? <Button><Loader2 />please wait</Button>:<Button onClick={onSubmitHandler}>Create Lecture</Button>
+            }
+          
         </div>
       </div>
 
       {/* Lecture List */}
       <div className="space-y-3 mt-6">
-        {lecturesData.map((lecture, index) => (
+        {data?.course?.Lectures?.map((lecture, index) => (
           <Card key={index} className="flex flex-row  items-center justify-between p-4">
             <CardContent className="p-0">
               <span className="font-semibold">
-                Lecture - {index + 1}: {lecture}
+                Lecture - {index + 1}: {lecture.lectureTitle}
               </span>
             </CardContent>
             <Tooltip>
               <TooltipTrigger>
-                <Button variant="ghost" size="sm" className="p-1">
+                <Button onClick={()=>navigate(`${lecture._id}`)} variant="ghost" size="sm" className="p-1">
                   <Edit className="w-5 h-5" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Edit Lecture</TooltipContent>
+              <TooltipContent >Edit Lecture</TooltipContent>
             </Tooltip>
           </Card>
         ))}

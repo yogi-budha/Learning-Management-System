@@ -13,6 +13,7 @@ import CoursesTable from './pages/admin/CoursesTable'
 import CreateCourses from './pages/admin/CreateCourses'
 import CourseForm from './pages/admin/CourseForm'
 import CreateLecture from './pages/lecture/CreateLecture'
+import EditLecture from './pages/lecture/EditLecture'
 
 
 
@@ -72,6 +73,10 @@ function App() {
         {
           path:"dashboard/courses/createCourseForm/:id/lecture",
           element:<CreateLecture/>
+        },
+        {
+          path:"dashboard/courses/createCourseForm/:id/lecture/:lectureId",
+          element:<EditLecture/>
         }
       ]
     }
