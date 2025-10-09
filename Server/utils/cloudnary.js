@@ -5,6 +5,7 @@ export const uploadMediaToCloudnary = async (file)=>{
        const res =  await cloudinary.uploader.upload(file,{
             resource_type:'auto'
         })
+        console.log(res)
         return res
     } catch (error) {
         console.log(error)

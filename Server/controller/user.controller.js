@@ -130,7 +130,7 @@ export const updateUser = async(req,res)=>{
 
     }
     if(user.photoUrl){
-      const publicId = await user.photoUrl.split("/").pop().split(".")[0]
+      const publicId =  user.photoUrl.split("/").pop().split(".")[0]
       await deleteMediaFromCloudnary(publicId)
     }
 

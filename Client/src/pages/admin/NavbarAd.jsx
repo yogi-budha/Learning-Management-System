@@ -10,8 +10,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Search, Bell, Settings, ChevronDown, Plus } from "lucide-react"
 import { Link } from "react-router-dom"
+import { useSelector } from "react-redux"
 
 export default function NavbarAd({name,isSearch=true,isFilter=true,isCreateCourses=true}) {
+  
+  const {user} = useSelector((state)=>state.auth)
   return (
     <div className="flex justify-between items-center w-[95%] mx-auto   px-15 rounded-xl shadow-sm py-2 bg-white mb-10 ">
       {/* Left Side */}
@@ -42,11 +45,11 @@ export default function NavbarAd({name,isSearch=true,isFilter=true,isCreateCours
         {/* User Info */}
         <div className="flex items-center space-x-3">
           <div className="text-right">
-            <p className="font-semibold text-sm text-gray-800">Nabila A.</p>
-            <p className="text-xs text-gray-400">Admin</p>
+            <p className="font-semibold text-sm text-gray-800">{user?.name}.</p>
+            <p className="text-xs text-gray-400 capitalize">{user?.role}</p>
           </div>
           <Avatar className="h-10 w-10">
-            <AvatarImage src="https://randomuser.me/api/portraits/women/44.jpg" alt="Nabila" />
+            <AvatarImage src= {user?.photoUrl} alt="Nabila" />
             <AvatarFallback>NA</AvatarFallback>
           </Avatar>
         </div>

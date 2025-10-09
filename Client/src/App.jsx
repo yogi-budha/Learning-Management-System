@@ -75,7 +75,7 @@ function App() {
           element:<CreateLecture/>
         },
         {
-          path:"dashboard/courses/createCourseForm/:id/lecture/:lectureId",
+          path:"dashboard/courses/createCourseForm/:courseId/lecture/:lectureId",
           element:<EditLecture/>
         }
       ]

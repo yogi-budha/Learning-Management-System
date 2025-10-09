@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -10,23 +10,97 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import NavbarAd from "../admin/NavbarAd";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import { toast } from "sonner";
+import { Progress } from "@/components/ui/progress";
+import { useDeleteLectureMutation, useEditLectureMutation, useGetLectureQuery } from "@/features/api/courseApi";
 
 export default function EditLecture() {
-  const [title, setTitle] = useState(
-    "Introduction to Docker and Containerization"
-  );
+  const [title, setTitle] = useState("");
   const [isFree, setIsFree] = useState(false);
   const [file, setFile] = useState(null);
+  const [mediaProgress,setMediaProgress] = useState(false)
+  const [uploadMedia,setuploadMedia] = useState(0)
+  const [uploadVideoInfo,setUploadVideoInfo] = useState(null)
+  const [btnDisable,setBtnDisable] = useState(true)
   const navigate = useNavigate();
+  const {courseId,lectureId} = useParams()
 
-  const handleFileChange = (e) => setFile(e.target.files[0]);
+  const [editLecture,{isSuccess,isError,isLoading}] = useEditLectureMutation()
+  const {data} = useGetLectureQuery(lectureId)
+  const [removeLecture,{isSuccess:successRemoveLecure,isError:errorRemoveLecture,isLoading:loadingdelete}] = useDeleteLectureMutation()
 
-  const handleUpdate = () => {
-    console.log({ title, isFree, file });
+  useEffect(()=>{
+    if(data){
+      setTitle(data.lecture.lectureTitle)
+      console.log(data)
+      setIsFree(data.lecture.isPreviewFree)
+      setUploadVideoInfo({videoUrl:data.lecture.videoUrl})
+    }
+  },[data])
+
+  useEffect(()=>{
+    if(successRemoveLecure){
+      toast.success("Lecture remove successfully")
+    }
+    if(errorRemoveLecture){
+      toast.success("error while remove Lecture")
+    }
+  },[successRemoveLecure,errorRemoveLecture])
+
+
+
+const media_url = 'http://localhost:5000/api/media'
+
+  const handleFileChange =async (e) =>{ 
+    const selectedFileChange = e.target.files[0]
+    console.log(selectedFileChange)
+    if(selectedFileChange){
+      setFile(selectedFileChange)
+
+      const formData = new FormData()
+      formData.append("videoFile",selectedFileChange)
+      setMediaProgress(true)
+      try {
+         const res = await axios.post(`${media_url}/upload_video`,formData,{
+          onUploadProgress:({loaded,total})=>{
+            setuploadMedia(Math.round((loaded*100)/total))
+          }
+         })
+      if(res.data.success){
+        setUploadVideoInfo({videoUrl:res.data.data.secure_url, publicId:res.data.data.public_id})
+        console.log(res)
+        setBtnDisable(false)
+        toast.success("successfully upload the video")
+      }
+      } catch (error) {
+        console.log(error.message)
+        toast.error("video upload failed")
+      }finally{
+        setMediaProgress(false)
+      }
+    }
+   
+
   };
+
+  const handleUpdate = async() => {
+    console.log({ title, isFree ,file});
+   await editLecture({lectureTitle:title,isFree,file,publicId:uploadVideoInfo.publicId,videoUrl:uploadVideoInfo.videoUrl,courseId,lectureId})
+  };
+
+  useEffect(()=>{
+    if(isSuccess){
+      toast.success("Lecture Updated Successfully")
+     
+    }
+    if(isError){
+      toast.error("Error while update Lecture")
+    }
+  },[isSuccess,isError])
 
   return (
     <div className="flex flex-col w-[80%] h-full p-4 ml-[18rem]">
@@ -56,7 +130,11 @@ export default function EditLecture() {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Remove button */}
-            <Button variant="destructive">Remove Lecture</Button>
+            <Button variant="destructive" onClick={()=>{removeLecture(lectureId), navigate(-1)}}>          {
+              loadingdelete ? <>
+              <Loader2 className="animate-spin"/> Please wait
+              </>: "Remove Lecture"
+             }</Button>
 
             {/* Title input */}
             <div className="space-y-2">
@@ -80,12 +158,14 @@ export default function EditLecture() {
                 accept="video/*"
                 onChange={handleFileChange}
               />
-              {file && (
-                <p className="text-sm text-gray-500">
-                  Selected: <span className="font-medium">{file.name}</span>
-                </p>
-              )}
             </div>
+
+            {
+              mediaProgress && <>
+              <Progress value={uploadMedia}/>
+              <p>{uploadMedia}% uploadProgress</p>
+              </>
+            } 
 
             {/* Free video switch */}
             <div className="flex items-center space-x-3">
@@ -99,7 +179,11 @@ export default function EditLecture() {
 
             {/* Update button */}
             <Button onClick={handleUpdate} className="w-full">
-              Update Lecture
+             {
+              isLoading ? <>
+              <Loader2 className="animate-spin"/> Please wait
+              </>: "UpdateLecture"
+             }
             </Button>
           </CardContent>
         </Card>

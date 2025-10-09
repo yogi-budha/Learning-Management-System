@@ -13,7 +13,7 @@ import {
 import Editor from "@/components/Editor";
 import NavbarAd from "./NavbarAd";
 import { Link, useParams } from "react-router-dom";
-import { useEditCourseMutation, useGetCourseByIdQuery } from "@/features/api/courseApi";
+import { useEditCourseMutation, useGetCourseByIdQuery, usePublishCourseMutation } from "@/features/api/courseApi";
 import { toast } from "sonner";
 
 export default function CourseForm() {
@@ -32,6 +32,7 @@ export default function CourseForm() {
   const { id } = useParams();
   const [editCourse, { isError, isSuccess, isLoading }] = useEditCourseMutation();
   const {data} = useGetCourseByIdQuery(id)
+  const [publishCourse] = usePublishCourseMutation()
 
   const onChangeHandler = (e) => {
     const { name, value } = e.target;
@@ -95,6 +96,17 @@ export default function CourseForm() {
     if (isError) toast.error("Error while updating");
   }, [isSuccess, isError]);
 
+  const publishCourseHandler = async (action)=>{
+    console.log(action)
+
+ const res = await publishCourse({courseId:id,query:action})
+ console.log(res)
+ if(res.data){
+  toast.success(res.data.message ||"course published")
+ }else{
+  toast.error("course not published")
+ }
+  }
   return (
     <div className="flex flex-col w-[80%] h-full p-4 ml-[18rem]">
       <NavbarAd
@@ -233,8 +245,8 @@ export default function CourseForm() {
 
             <div className="flex justify-end space-x-3 pt-4 border-t mt-6">
               <Button variant="destructive">Remove Course</Button>
-              <Button className="bg-green-600 hover:bg-green-700">
-                {isPublished ? "Publish" : "Unpublish"}
+              <Button disabled={(data?.course?.Lectures)==0} className="bg-green-600 hover:bg-green-700" onClick={()=>publishCourseHandler(data?.course?.published ? "false" : "true")}>
+                {data?.course?.published  ? "UnPublish" : "publish"}
               </Button>
             </div>
           </CardContent>

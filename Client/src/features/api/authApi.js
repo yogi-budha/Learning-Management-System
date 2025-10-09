@@ -66,7 +66,7 @@ export const authApi = createApi({
                 method:"PUT",
                 body:data
             })
-        })
+        }),
     })
 })
 
